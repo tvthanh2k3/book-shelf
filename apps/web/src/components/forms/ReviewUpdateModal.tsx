@@ -1,11 +1,18 @@
-import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useCreateReview, useAllBooks } from '@/hooks/useReviews'
+import { useUpdateReview, useAllBooks } from '@/hooks/useReviews'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import {
   Select,
   SelectContent,
@@ -13,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import type { Review } from '@/types'
 
 const schema = z.object({
   book_id: z.string().min(1, '* Please select book'),
@@ -21,9 +29,13 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>
 
-export default function ReviewsCreate() {
-  const navigate = useNavigate()
-  const createReview = useCreateReview()
+interface ReviewUpdateModalProps {
+  review: Review | null
+  onClose: () => void
+}
+
+export default function ReviewUpdateModal({ review, onClose }: ReviewUpdateModalProps) {
+  const updateReview = useUpdateReview()
   const { data: books } = useAllBooks()
 
   const {
@@ -31,25 +43,30 @@ export default function ReviewsCreate() {
     handleSubmit,
     setValue,
     watch,
+    reset,
     formState: { errors },
   } = useForm<FormValues>({ resolver: zodResolver(schema) })
 
+  useEffect(() => {
+    if (review) reset({ book_id: String(review.book_id), review: review.review })
+  }, [review, reset])
+
   const onSubmit = (values: FormValues) => {
-    createReview.mutate(
-      { book_id: Number(values.book_id), review: values.review },
-      { onSuccess: () => navigate('/reviews/list') }
+    if (!review) return
+    updateReview.mutate(
+      { id: review.id, payload: { book_id: Number(values.book_id), review: values.review } },
+      { onSuccess: () => { reset(); onClose() } }
     )
   }
 
   return (
-    <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-foreground">Create Review</h1>
-        <p className="text-sm text-muted-foreground mt-1">Add a new book review</p>
-      </div>
+    <Dialog open={!!review} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Update Review</DialogTitle>
+        </DialogHeader>
 
-      <div className="max-w-md rounded-lg border bg-card p-6 shadow-sm">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-2">
           <div className="space-y-1.5">
             <Label>Book</Label>
             <Select
@@ -85,21 +102,16 @@ export default function ReviewsCreate() {
             )}
           </div>
 
-          <div className="flex gap-3 pt-1">
-            <Button type="submit" disabled={createReview.isPending}>
-              {createReview.isPending ? 'Creating...' : 'Create'}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate('/reviews/list')}
-              disabled={createReview.isPending}
-            >
+          <DialogFooter className="gap-2">
+            <Button type="button" variant="outline" onClick={onClose} disabled={updateReview.isPending}>
               Cancel
             </Button>
-          </div>
+            <Button type="submit" disabled={updateReview.isPending}>
+              {updateReview.isPending ? 'Saving...' : 'Save'}
+            </Button>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }
