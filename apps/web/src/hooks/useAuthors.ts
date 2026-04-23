@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { createAuthor, deleteAuthor, getAuthors, updateAuthor } from '@/services/authors'
 import type { AuthorCreate, AuthorUpdate } from '@/types'
 
@@ -16,7 +17,11 @@ export const useCreateAuthor = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (payload: AuthorCreate) => createAuthor(payload),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+      toast.success('Author created successfully')
+    },
+    onError: (err: Error) => toast.error(err.message),
   })
 }
 
@@ -25,7 +30,11 @@ export const useUpdateAuthor = () => {
   return useMutation({
     mutationFn: ({ id, payload }: { id: number; payload: AuthorUpdate }) =>
       updateAuthor(id, payload),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+      toast.success('Author updated successfully')
+    },
+    onError: (err: Error) => toast.error(err.message),
   })
 }
 
@@ -33,6 +42,10 @@ export const useDeleteAuthor = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: number) => deleteAuthor(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+      toast.success('Author deleted successfully')
+    },
+    onError: (err: Error) => toast.error(err.message),
   })
 }
