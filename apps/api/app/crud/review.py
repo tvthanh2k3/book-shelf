@@ -42,6 +42,31 @@ async def get_by_id(db: AsyncSession, review_id: int):
     return result.scalar_one_or_none()
 
 
+async def get_by_id_with_details(db: AsyncSession, review_id: int):
+    stmt = (
+        select(
+            Review,
+            Book.title.label("book_title"),
+            Author.name.label("author_name"),
+        )
+        .join(Book, Review.book_id == Book.id)
+        .join(Author, Book.author_id == Author.id)
+        .where(Review.id == review_id)
+    )
+    result = await db.execute(stmt)
+    row = result.one_or_none()
+    if not row:
+        return None
+    review, book_title, author_name = row
+    return {
+        "id": review.id,
+        "book_id": review.book_id,
+        "review": review.review,
+        "book_title": book_title,
+        "author_name": author_name,
+    }
+
+
 async def create(db: AsyncSession, data: ReviewCreate):
     review = Review(book_id=data.book_id, review=data.review)
     db.add(review)
