@@ -1,11 +1,18 @@
-import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useCreateBook, useAllAuthors } from '@/hooks/useBooks'
+import { useUpdateBook, useAllAuthors } from '@/hooks/useBooks'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import {
   Select,
   SelectContent,
@@ -13,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import type { Book } from '@/types'
 
 const schema = z.object({
   title: z.string().min(1, '* Please enter name'),
@@ -21,9 +29,13 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>
 
-export default function BooksCreate() {
-  const navigate = useNavigate()
-  const createBook = useCreateBook()
+interface BookUpdateModalProps {
+  book: Book | null
+  onClose: () => void
+}
+
+export default function BookUpdateModal({ book, onClose }: BookUpdateModalProps) {
+  const updateBook = useUpdateBook()
   const { data: authors } = useAllAuthors()
 
   const {
@@ -31,25 +43,30 @@ export default function BooksCreate() {
     handleSubmit,
     setValue,
     watch,
+    reset,
     formState: { errors },
   } = useForm<FormValues>({ resolver: zodResolver(schema) })
 
+  useEffect(() => {
+    if (book) reset({ title: book.title, author_id: String(book.author_id) })
+  }, [book, reset])
+
   const onSubmit = (values: FormValues) => {
-    createBook.mutate(
-      { title: values.title, author_id: Number(values.author_id) },
-      { onSuccess: () => navigate('/books/list') }
+    if (!book) return
+    updateBook.mutate(
+      { id: book.id, payload: { title: values.title, author_id: Number(values.author_id) } },
+      { onSuccess: () => { reset(); onClose() } }
     )
   }
 
   return (
-    <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-foreground">Create Book</h1>
-        <p className="text-sm text-muted-foreground mt-1">Add a new book to the list</p>
-      </div>
+    <Dialog open={!!book} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Update Book</DialogTitle>
+        </DialogHeader>
 
-      <div className="max-w-md rounded-lg border bg-card p-6 shadow-sm">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-2">
           <div className="space-y-1.5">
             <Label htmlFor="title">Title</Label>
             <Input id="title" {...register('title')} placeholder="Book title" />
@@ -80,21 +97,16 @@ export default function BooksCreate() {
             )}
           </div>
 
-          <div className="flex gap-3 pt-1">
-            <Button type="submit" disabled={createBook.isPending}>
-              {createBook.isPending ? 'Creating...' : 'Create'}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate('/books/list')}
-              disabled={createBook.isPending}
-            >
+          <DialogFooter className="gap-2">
+            <Button type="button" variant="outline" onClick={onClose} disabled={updateBook.isPending}>
               Cancel
             </Button>
-          </div>
+            <Button type="submit" disabled={updateBook.isPending}>
+              {updateBook.isPending ? 'Saving...' : 'Save'}
+            </Button>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }
