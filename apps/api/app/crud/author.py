@@ -31,6 +31,22 @@ async def get_by_id(db: AsyncSession, author_id: int):
     return result.scalar_one_or_none()
 
 
+async def get_by_id_with_count(db: AsyncSession, author_id: int):
+    count_sub = (
+        select(func.count(Book.id))
+        .where(Book.author_id == Author.id)
+        .correlate(Author)
+        .scalar_subquery()
+    )
+    stmt = select(Author, count_sub.label("books_count")).where(Author.id == author_id)
+    result = await db.execute(stmt)
+    row = result.one_or_none()
+    if not row:
+        return None
+    author, books_count = row
+    return {"id": author.id, "name": author.name, "books_count": books_count}
+
+
 async def create(db: AsyncSession, data: AuthorCreate):
     author = Author(name=data.name)
     db.add(author)
