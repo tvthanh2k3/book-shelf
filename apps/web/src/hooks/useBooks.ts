@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { createBook, deleteBook, getBooks, updateBook } from '@/services/books'
 import { getAuthors } from '@/services/authors'
 import type { BookCreate, BookUpdate } from '@/types'
@@ -24,7 +25,11 @@ export const useCreateBook = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (payload: BookCreate) => createBook(payload),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+      toast.success('Book created successfully')
+    },
+    onError: (err: Error) => toast.error(err.message),
   })
 }
 
@@ -33,7 +38,11 @@ export const useUpdateBook = () => {
   return useMutation({
     mutationFn: ({ id, payload }: { id: number; payload: BookUpdate }) =>
       updateBook(id, payload),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+      toast.success('Book updated successfully')
+    },
+    onError: (err: Error) => toast.error(err.message),
   })
 }
 
@@ -41,6 +50,10 @@ export const useDeleteBook = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: number) => deleteBook(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+      toast.success('Book deleted successfully')
+    },
+    onError: (err: Error) => toast.error(err.message),
   })
 }

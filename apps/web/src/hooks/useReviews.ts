@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { createReview, deleteReview, getReviews, updateReview } from '@/services/reviews'
 import { getBooks } from '@/services/books'
 import type { ReviewCreate, ReviewUpdate } from '@/types'
@@ -24,7 +25,11 @@ export const useCreateReview = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (payload: ReviewCreate) => createReview(payload),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+      toast.success('Review created successfully')
+    },
+    onError: (err: Error) => toast.error(err.message),
   })
 }
 
@@ -33,7 +38,11 @@ export const useUpdateReview = () => {
   return useMutation({
     mutationFn: ({ id, payload }: { id: number; payload: ReviewUpdate }) =>
       updateReview(id, payload),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+      toast.success('Review updated successfully')
+    },
+    onError: (err: Error) => toast.error(err.message),
   })
 }
 
@@ -41,6 +50,10 @@ export const useDeleteReview = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: number) => deleteReview(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEY] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+      toast.success('Review deleted successfully')
+    },
+    onError: (err: Error) => toast.error(err.message),
   })
 }
