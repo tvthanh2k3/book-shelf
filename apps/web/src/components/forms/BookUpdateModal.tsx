@@ -24,7 +24,7 @@ import type { Book } from '@/types'
 
 const schema = z.object({
   title: z.string().min(1, '* Please enter name'),
-  author_id: z.coerce.number({ invalid_type_error: '* Please select author' }).min(1, '* Please select author'),
+  author_id: z.string().min(1, '* Please select author'),
 })
 
 type FormValues = z.infer<typeof schema>
@@ -48,13 +48,13 @@ export default function BookUpdateModal({ book, onClose }: BookUpdateModalProps)
   } = useForm<FormValues>({ resolver: zodResolver(schema) })
 
   useEffect(() => {
-    if (book) reset({ title: book.title, author_id: book.author_id })
+    if (book) reset({ title: book.title, author_id: String(book.author_id) })
   }, [book, reset])
 
   const onSubmit = (values: FormValues) => {
     if (!book) return
     updateBook.mutate(
-      { id: book.id, payload: values },
+      { id: book.id, payload: { title: values.title, author_id: Number(values.author_id) } },
       { onSuccess: () => { reset(); onClose() } }
     )
   }
@@ -78,8 +78,8 @@ export default function BookUpdateModal({ book, onClose }: BookUpdateModalProps)
           <div className="space-y-1.5">
             <Label>Author</Label>
             <Select
-              value={watch('author_id') ? String(watch('author_id')) : ''}
-              onValueChange={(val) => setValue('author_id', Number(val), { shouldValidate: true })}
+              value={watch('author_id') ?? ''}
+              onValueChange={(val) => setValue('author_id', val, { shouldValidate: true })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select author" />
