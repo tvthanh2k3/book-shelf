@@ -13,7 +13,7 @@ async def get_all(db: AsyncSession, skip: int, limit: int):
         .correlate(Author)
         .scalar_subquery()
     )
-    stmt = select(Author, count_sub.label("books_count")).offset(skip).limit(limit)
+    stmt = select(Author, count_sub.label("books_count")).order_by(Author.id.desc()).offset(skip).limit(limit)
     result = await db.execute(stmt)
     rows = result.all()
 

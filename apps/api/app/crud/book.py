@@ -10,6 +10,7 @@ async def get_all(db: AsyncSession, skip: int, limit: int):
     stmt = (
         select(Book, Author.name.label("author_name"))
         .join(Author, Book.author_id == Author.id)
+        .order_by(Book.id.desc())
         .offset(skip)
         .limit(limit)
     )
