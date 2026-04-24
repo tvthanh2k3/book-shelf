@@ -40,7 +40,7 @@ export default function DataTable<T>({
 }: DataTableProps<T>) {
   return (
     <div className="rounded-md border">
-      <Table>
+      <Table className="table-fixed">
         <TableHeader>
           <TableRow className="bg-muted/50">
             {columns.map((col, i) => (

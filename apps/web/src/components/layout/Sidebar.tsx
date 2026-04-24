@@ -86,7 +86,7 @@ export default function Sidebar() {
                         cn(
                           'block py-1.5 px-3 text-sm rounded-md transition-colors',
                           isActive
-                            ? 'bg-sidebar-primary text-sidebar-primary-foreground font-medium'
+                            ? 'bg-sidebar-primary text-sidebar-primary-foreground font-medium mr-2'
                             : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                         )
                       }
