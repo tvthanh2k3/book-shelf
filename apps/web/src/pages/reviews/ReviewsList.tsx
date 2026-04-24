@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
 import { useReviews, useDeleteReview } from '@/hooks/useReviews'
+import { usePaginatedList } from '@/hooks/usePaginatedList'
 import DataTable, { type Column } from '@/components/common/DataTable'
 import Pagination from '@/components/common/Pagination'
 import ConfirmDeleteModal from '@/components/common/ConfirmDeleteModal'
@@ -8,10 +9,8 @@ import ReviewUpdateModal from '@/components/forms/ReviewUpdateModal'
 import { Button } from '@/components/ui/button'
 import type { Review } from '@/types'
 
-const PAGE_SIZE = 10
-
 export default function ReviewsList() {
-  const [page, setPage] = useState(1)
+  const { page, PAGE_SIZE, rowNumber, goToPrevIfEmpty, paginationProps } = usePaginatedList()
   const [editTarget, setEditTarget] = useState<Review | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Review | null>(null)
 
@@ -21,14 +20,17 @@ export default function ReviewsList() {
   const handleDelete = () => {
     if (!deleteTarget) return
     deleteReview.mutate(deleteTarget.id, {
-      onSuccess: () => setDeleteTarget(null),
+      onSuccess: () => {
+        setDeleteTarget(null)
+        goToPrevIfEmpty(data?.items.length ?? 0)
+      },
     })
   }
 
   const columns: Column<Review>[] = [
     {
       header: 'No',
-      cell: (_, index) => (data?.skip ?? 0) + index + 1,
+      cell: (_, index) => rowNumber(index),
       className: 'w-16 text-muted-foreground',
     },
     {
@@ -81,16 +83,10 @@ export default function ReviewsList() {
       <DataTable
         columns={columns}
         data={data?.items ?? []}
-        skip={data?.skip ?? 0}
         isLoading={isLoading}
       />
 
-      <Pagination
-        total={data?.total ?? 0}
-        page={page}
-        pageSize={PAGE_SIZE}
-        onChange={setPage}
-      />
+      <Pagination total={data?.total ?? 0} {...paginationProps} />
 
       <ReviewUpdateModal
         review={editTarget}
