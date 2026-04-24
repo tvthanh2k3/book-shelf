@@ -1,51 +1,22 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-import { createAuthor, deleteAuthor, getAuthors, updateAuthor } from '@/services/authors'
-import type { AuthorCreate, AuthorUpdate } from '@/types'
+import { useQuery } from '@tanstack/react-query'
+import { createCRUDHooks } from './createCRUDHooks'
+import { getAuthors, createAuthor, updateAuthor, deleteAuthor } from '@/services/authors'
+import type { Author, AuthorCreate, AuthorUpdate } from '@/types'
 
-const QUERY_KEY = 'authors'
+const { useList, useCreate, useUpdate, useRemove } = createCRUDHooks<Author, AuthorCreate, AuthorUpdate>(
+  'authors',
+  { list: getAuthors, create: createAuthor, update: updateAuthor, remove: deleteAuthor },
+  'Author',
+)
 
-export const useAuthors = (page: number, pageSize: number) => {
-  const skip = (page - 1) * pageSize
-  return useQuery({
-    queryKey: [QUERY_KEY, page, pageSize],
-    queryFn: () => getAuthors(skip, pageSize),
+export const useAuthors = useList
+export const useCreateAuthor = useCreate
+export const useUpdateAuthor = useUpdate
+export const useDeleteAuthor = useRemove
+
+export const useAllAuthors = () =>
+  useQuery({
+    queryKey: ['authors', 'all'],
+    queryFn: () => getAuthors(0, 1000),
+    select: (data) => data.items,
   })
-}
-
-export const useCreateAuthor = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: (payload: AuthorCreate) => createAuthor(payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
-      toast.success('Author created successfully')
-    },
-    onError: (err: Error) => toast.error(err.message),
-  })
-}
-
-export const useUpdateAuthor = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: ({ id, payload }: { id: number; payload: AuthorUpdate }) =>
-      updateAuthor(id, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
-      toast.success('Author updated successfully')
-    },
-    onError: (err: Error) => toast.error(err.message),
-  })
-}
-
-export const useDeleteAuthor = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: (id: number) => deleteAuthor(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
-      toast.success('Author deleted successfully')
-    },
-    onError: (err: Error) => toast.error(err.message),
-  })
-}

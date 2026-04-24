@@ -2,7 +2,8 @@ import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useCreateBook, useAllAuthors } from '@/hooks/useBooks'
+import { useCreateBook } from '@/hooks/useBooks'
+import { useAllAuthors } from '@/hooks/useAuthors'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -13,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import FieldError from '@/components/common/FieldError'
 
 const schema = z.object({
   title: z.string().min(1, '* Please enter name'),
@@ -53,9 +55,7 @@ export default function BooksCreate() {
           <div className="space-y-1.5">
             <Label htmlFor="title">Title</Label>
             <Input id="title" {...register('title')} placeholder="Book title" />
-            {errors.title && (
-              <p className="text-xs text-destructive">{errors.title.message}</p>
-            )}
+            <FieldError message={errors.title?.message} />
           </div>
 
           <div className="space-y-1.5">
@@ -75,9 +75,7 @@ export default function BooksCreate() {
                 ))}
               </SelectContent>
             </Select>
-            {errors.author_id && (
-              <p className="text-xs text-destructive">{errors.author_id.message}</p>
-            )}
+            <FieldError message={errors.author_id?.message} />
           </div>
 
           <div className="flex gap-3 pt-1">

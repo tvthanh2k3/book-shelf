@@ -1,12 +1,11 @@
 import { useState } from 'react'
-import { Pencil, Trash2 } from 'lucide-react'
 import { useBooks, useDeleteBook } from '@/hooks/useBooks'
 import { usePaginatedList } from '@/hooks/usePaginatedList'
 import DataTable, { type Column } from '@/components/common/DataTable'
 import Pagination from '@/components/common/Pagination'
 import ConfirmDeleteModal from '@/components/common/ConfirmDeleteModal'
 import BookUpdateModal from '@/components/forms/BookUpdateModal'
-import { Button } from '@/components/ui/button'
+import { actionColumn } from '@/components/common/actionColumn'
 import type { Book } from '@/types'
 
 export default function BooksList() {
@@ -41,30 +40,7 @@ export default function BooksList() {
       header: 'Author',
       cell: (row) => <span className="text-muted-foreground">{row.author_name}</span>,
     },
-    {
-      header: 'Actions',
-      className: 'w-24 text-center',
-      cell: (row) => (
-        <div className="flex items-center justify-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
-            onClick={() => setEditTarget(row)}
-          >
-            <Pencil size={15} />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
-            onClick={() => setDeleteTarget(row)}
-          >
-            <Trash2 size={15} />
-          </Button>
-        </div>
-      ),
-    },
+    actionColumn(setEditTarget, setDeleteTarget),
   ]
 
   return (

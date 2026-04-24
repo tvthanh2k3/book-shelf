@@ -2,7 +2,8 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useUpdateBook, useAllAuthors } from '@/hooks/useBooks'
+import { useUpdateBook } from '@/hooks/useBooks'
+import { useAllAuthors } from '@/hooks/useAuthors'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -20,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import FieldError from '@/components/common/FieldError'
 import type { Book } from '@/types'
 
 const schema = z.object({
@@ -70,9 +72,7 @@ export default function BookUpdateModal({ book, onClose }: BookUpdateModalProps)
           <div className="space-y-1.5">
             <Label htmlFor="title">Title</Label>
             <Input id="title" {...register('title')} placeholder="Book title" />
-            {errors.title && (
-              <p className="text-xs text-destructive">{errors.title.message}</p>
-            )}
+            <FieldError message={errors.title?.message} />
           </div>
 
           <div className="space-y-1.5">
@@ -92,9 +92,7 @@ export default function BookUpdateModal({ book, onClose }: BookUpdateModalProps)
                 ))}
               </SelectContent>
             </Select>
-            {errors.author_id && (
-              <p className="text-xs text-destructive">{errors.author_id.message}</p>
-            )}
+            <FieldError message={errors.author_id?.message} />
           </div>
 
           <DialogFooter className="gap-2">
