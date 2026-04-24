@@ -30,17 +30,18 @@ export default function BooksList() {
     {
       header: 'No',
       cell: (_, index) => rowNumber(index),
-      className: 'w-16 text-muted-foreground',
+      className: 'w-[5%] text-muted-foreground',
     },
     {
       header: 'Title',
-      cell: (row) => <span className="font-medium">{row.title}</span>,
+      cell: (row) => <span className="font-medium text-sm line-clamp-2">{row.title}</span>,
+      className: 'w-[50%]',
     },
     {
       header: 'Author',
-      cell: (row) => <span className="text-muted-foreground">{row.author_name}</span>,
+      cell: (row) => <span className="text-sm line-clamp-2 text-muted-foreground">{row.author_name}</span>,
     },
-    actionColumn(setEditTarget, setDeleteTarget),
+    actionColumn(setEditTarget, setDeleteTarget, 'w-[15%] text-center'),
   ]
 
   return (

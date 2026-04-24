@@ -30,18 +30,19 @@ export default function AuthorsList() {
     {
       header: 'No',
       cell: (_, index) => rowNumber(index),
-      className: 'w-16 text-muted-foreground',
+      className: 'w-[5%] text-muted-foreground',
     },
     {
       header: 'Name',
-      cell: (row) => <span className="font-medium">{row.name}</span>,
+      cell: (row) => <span className="font-medium text-sm line-clamp-2">{row.name}</span>,
+      className: 'w-[50%]',
     },
     {
       header: 'Books',
       cell: (row) => row.books_count,
-      className: 'w-24 text-center',
+      className: 'text-center',
     },
-    actionColumn(setEditTarget, setDeleteTarget),
+    actionColumn(setEditTarget, setDeleteTarget, 'w-[15%] text-center'),
   ]
 
   return (

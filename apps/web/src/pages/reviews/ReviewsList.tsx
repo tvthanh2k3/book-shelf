@@ -30,23 +30,23 @@ export default function ReviewsList() {
     {
       header: 'No',
       cell: (_, index) => rowNumber(index),
-      className: 'w-16 text-muted-foreground',
-    },
-    {
-      header: 'Book',
-      cell: (row) => <span className="font-medium">{row.book_title}</span>,
-    },
-    {
-      header: 'Author',
-      cell: (row) => <span className="text-muted-foreground">{row.author_name}</span>,
+      className: 'w-[5%] text-muted-foreground',
     },
     {
       header: 'Review',
-      cell: (row) => (
-        <span className="text-sm line-clamp-2 max-w-xs">{row.review}</span>
-      ),
+      cell: (row) => <span className="font-medium text-sm line-clamp-2">{row.review}</span>,
+      className: 'w-[50%]',
     },
-    actionColumn(setEditTarget, setDeleteTarget),
+    {
+      header: 'Book',
+      cell: (row) => <span className="text-sm line-clamp-2">{row.book_title}</span>,
+      className: 'w-[15%]'
+    },
+    {
+      header: 'Author',
+      cell: (row) => <span className="text-sm line-clamp-2 text-muted-foreground">{row.author_name}</span>,
+    },
+    actionColumn(setEditTarget, setDeleteTarget, 'w-[15%] text-center'),
   ]
 
   return (

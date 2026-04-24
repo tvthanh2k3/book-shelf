@@ -5,10 +5,11 @@ import type { Column } from '@/components/common/DataTable'
 export function actionColumn<T>(
   onEdit: (row: T) => void,
   onDelete: (row: T) => void,
+  className = 'w-24 text-center',
 ): Column<T> {
   return {
     header: 'Actions',
-    className: 'w-24 text-center',
+    className,
     cell: (row) => (
       <div className="flex items-center justify-center gap-2">
         <Button
