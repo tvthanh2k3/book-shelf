@@ -6,6 +6,7 @@ import { useCreateAuthor } from '@/hooks/useAuthors'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import FieldError from '@/components/common/FieldError'
 
 const schema = z.object({
   name: z.string().min(1, '* Please enter name'),
@@ -41,9 +42,7 @@ export default function AuthorsCreate() {
           <div className="space-y-1.5">
             <Label htmlFor="name">Name</Label>
             <Input id="name" {...register('name')} placeholder="Author name" />
-            {errors.name && (
-              <p className="text-xs text-destructive">{errors.name.message}</p>
-            )}
+            <FieldError message={errors.name?.message} />
           </div>
 
           <div className="flex gap-3 pt-1">

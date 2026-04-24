@@ -2,7 +2,8 @@ import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useCreateReview, useAllBooks } from '@/hooks/useReviews'
+import { useCreateReview } from '@/hooks/useReviews'
+import { useAllBooks } from '@/hooks/useBooks'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -13,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import FieldError from '@/components/common/FieldError'
 
 const schema = z.object({
   book_id: z.string().min(1, '* Please select book'),
@@ -67,9 +69,7 @@ export default function ReviewsCreate() {
                 ))}
               </SelectContent>
             </Select>
-            {errors.book_id && (
-              <p className="text-xs text-destructive">{errors.book_id.message}</p>
-            )}
+            <FieldError message={errors.book_id?.message} />
           </div>
 
           <div className="space-y-1.5">
@@ -80,9 +80,7 @@ export default function ReviewsCreate() {
               placeholder="Write your review..."
               className="min-h-28 resize-none"
             />
-            {errors.review && (
-              <p className="text-xs text-destructive">{errors.review.message}</p>
-            )}
+            <FieldError message={errors.review?.message} />
           </div>
 
           <div className="flex gap-3 pt-1">

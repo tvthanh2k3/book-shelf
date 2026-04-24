@@ -13,6 +13,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
+import FieldError from '@/components/common/FieldError'
 import type { Author } from '@/types'
 
 const schema = z.object({
@@ -59,9 +60,7 @@ export default function AuthorUpdateModal({ author, onClose }: AuthorUpdateModal
           <div className="space-y-1.5">
             <Label htmlFor="name">Name</Label>
             <Input id="name" {...register('name')} placeholder="Author name" />
-            {errors.name && (
-              <p className="text-xs text-destructive">{errors.name.message}</p>
-            )}
+            <FieldError message={errors.name?.message} />
           </div>
 
           <DialogFooter className="gap-2">
