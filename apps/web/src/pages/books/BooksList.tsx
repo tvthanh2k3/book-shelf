@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
 import { useBooks, useDeleteBook } from '@/hooks/useBooks'
+import { usePaginatedList } from '@/hooks/usePaginatedList'
 import DataTable, { type Column } from '@/components/common/DataTable'
 import Pagination from '@/components/common/Pagination'
 import ConfirmDeleteModal from '@/components/common/ConfirmDeleteModal'
@@ -8,10 +9,8 @@ import BookUpdateModal from '@/components/forms/BookUpdateModal'
 import { Button } from '@/components/ui/button'
 import type { Book } from '@/types'
 
-const PAGE_SIZE = 5
-
 export default function BooksList() {
-  const [page, setPage] = useState(1)
+  const { page, PAGE_SIZE, rowNumber, goToPrevIfEmpty, paginationProps } = usePaginatedList()
   const [editTarget, setEditTarget] = useState<Book | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Book | null>(null)
 
@@ -23,7 +22,7 @@ export default function BooksList() {
     deleteBook.mutate(deleteTarget.id, {
       onSuccess: () => {
         setDeleteTarget(null)
-        if (data?.items.length === 1 && page > 1) setPage(page - 1)
+        goToPrevIfEmpty(data?.items.length ?? 0)
       },
     })
   }
@@ -31,7 +30,7 @@ export default function BooksList() {
   const columns: Column<Book>[] = [
     {
       header: 'No',
-      cell: (_, index) => (page - 1) * PAGE_SIZE + index + 1,
+      cell: (_, index) => rowNumber(index),
       className: 'w-16 text-muted-foreground',
     },
     {
@@ -81,12 +80,7 @@ export default function BooksList() {
         isLoading={isLoading}
       />
 
-      <Pagination
-        total={data?.total ?? 0}
-        page={page}
-        pageSize={PAGE_SIZE}
-        onChange={setPage}
-      />
+      <Pagination total={data?.total ?? 0} {...paginationProps} />
 
       <BookUpdateModal
         book={editTarget}
