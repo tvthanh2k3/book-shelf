@@ -1,21 +1,9 @@
-import type { Author, AuthorCreate, AuthorUpdate, PaginatedResponse } from '@/types'
-import api from './api'
+import type { Author, AuthorCreate, AuthorUpdate } from '@/types'
+import { createCRUDService } from './createCRUDService'
 
-export const getAuthors = async (skip: number, limit: number): Promise<PaginatedResponse<Author>> => {
-  const { data } = await api.get('/authors', { params: { skip, limit } })
-  return data
-}
+const service = createCRUDService<Author, AuthorCreate, AuthorUpdate>('/authors')
 
-export const createAuthor = async (payload: AuthorCreate): Promise<Author> => {
-  const { data } = await api.post('/authors', payload)
-  return data
-}
-
-export const updateAuthor = async (id: number, payload: AuthorUpdate): Promise<Author> => {
-  const { data } = await api.put(`/authors/${id}`, payload)
-  return data
-}
-
-export const deleteAuthor = async (id: number): Promise<void> => {
-  await api.delete(`/authors/${id}`)
-}
+export const getAuthors = service.list
+export const createAuthor = service.create
+export const updateAuthor = service.update
+export const deleteAuthor = service.remove
