@@ -8,7 +8,7 @@ import AuthorUpdateModal from '@/components/forms/AuthorUpdateModal'
 import { Button } from '@/components/ui/button'
 import type { Author } from '@/types'
 
-const PAGE_SIZE = 10
+const PAGE_SIZE = 5
 
 export default function AuthorsList() {
   const [page, setPage] = useState(1)
@@ -28,7 +28,7 @@ export default function AuthorsList() {
   const columns: Column<Author>[] = [
     {
       header: 'No',
-      cell: (_, index) => (data?.skip ?? 0) + index + 1,
+      cell: (_, index) => (page - 1) * PAGE_SIZE + index + 1,
       className: 'w-16 text-muted-foreground',
     },
     {
@@ -76,7 +76,6 @@ export default function AuthorsList() {
       <DataTable
         columns={columns}
         data={data?.items ?? []}
-        skip={data?.skip ?? 0}
         isLoading={isLoading}
       />
 

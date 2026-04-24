@@ -16,7 +16,6 @@ export interface Column<T> {
 interface DataTableProps<T> {
   columns: Column<T>[]
   data: T[]
-  skip?: number
   isLoading?: boolean
   emptyMessage?: string
 }
@@ -36,7 +35,6 @@ function SkeletonRows({ cols }: { cols: number }) {
 export default function DataTable<T>({
   columns,
   data,
-  skip = 0,
   isLoading,
   emptyMessage = 'No data found.',
 }: DataTableProps<T>) {
@@ -66,7 +64,7 @@ export default function DataTable<T>({
               <TableRow key={index} className="hover:bg-muted/30">
                 {columns.map((col, j) => (
                   <TableCell key={j} className={col.className}>
-                    {col.cell(row, skip + index)}
+                    {col.cell(row, index)}
                   </TableCell>
                 ))}
               </TableRow>
