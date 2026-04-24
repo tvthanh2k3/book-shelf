@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import crud
+from app.core.deps import PaginationParams
 from app.db.session import get_db
 from app.schemas.book import BookCreate, BookOut, BookUpdate
 from app.schemas.common import PaginatedResponse
@@ -10,9 +11,9 @@ router = APIRouter(prefix="/books", tags=["Books"])
 
 
 @router.get("", response_model=PaginatedResponse[BookOut])
-async def list_books(skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)):
-    total, items = await crud.book.get_all(db, skip=skip, limit=limit)
-    return {"total": total, "skip": skip, "limit": limit, "items": items}
+async def list_books(pagination: PaginationParams = Depends(), db: AsyncSession = Depends(get_db)):
+    total, items = await crud.book.get_all(db, skip=pagination.skip, limit=pagination.limit)
+    return {"total": total, "skip": pagination.skip, "limit": pagination.limit, "items": items}
 
 
 @router.post("", response_model=BookOut, status_code=status.HTTP_201_CREATED)
