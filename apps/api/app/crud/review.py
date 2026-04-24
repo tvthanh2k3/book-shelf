@@ -16,6 +16,7 @@ async def get_all(db: AsyncSession, skip: int, limit: int):
         )
         .join(Book, Review.book_id == Book.id)
         .join(Author, Book.author_id == Author.id)
+        .order_by(Review.id.desc())
         .offset(skip)
         .limit(limit)
     )
