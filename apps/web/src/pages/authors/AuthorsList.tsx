@@ -21,7 +21,10 @@ export default function AuthorsList() {
   const handleDelete = () => {
     if (!deleteTarget) return
     deleteAuthor.mutate(deleteTarget.id, {
-      onSuccess: () => setDeleteTarget(null),
+      onSuccess: () => {
+        setDeleteTarget(null)
+        if (data?.items.length === 1 && page > 1) setPage(page - 1)
+      },
     })
   }
 

@@ -21,7 +21,10 @@ export default function ReviewsList() {
   const handleDelete = () => {
     if (!deleteTarget) return
     deleteReview.mutate(deleteTarget.id, {
-      onSuccess: () => setDeleteTarget(null),
+      onSuccess: () => {
+        setDeleteTarget(null)
+        if (data?.items.length === 1 && page > 1) setPage(page - 1)
+      },
     })
   }
 

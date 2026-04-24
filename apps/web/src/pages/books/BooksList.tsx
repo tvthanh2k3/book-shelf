@@ -21,7 +21,10 @@ export default function BooksList() {
   const handleDelete = () => {
     if (!deleteTarget) return
     deleteBook.mutate(deleteTarget.id, {
-      onSuccess: () => setDeleteTarget(null),
+      onSuccess: () => {
+        setDeleteTarget(null)
+        if (data?.items.length === 1 && page > 1) setPage(page - 1)
+      },
     })
   }
 
